@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles, Typography, Paper } from '@material-ui/core';
 import { Grid } from '@material-ui/core';
-import CountUp from 'react-countup';
+//import CountUp from 'react-countup';
 
 
 const useStyles =  makeStyles(theme =>({
@@ -14,7 +14,8 @@ const useStyles =  makeStyles(theme =>({
         zIndex:'-1',
         padding:theme.spacing(2),
         '& .MuiPaper-root ':{
-            margin:theme.spacing(1)
+            margin:theme.spacing(1),
+            paddingBottom:theme.spacing(2),
         }
     },
 
@@ -26,7 +27,7 @@ const useStyles =  makeStyles(theme =>({
     },
 
     counter:{
-        textAlign:'center'
+        textAlign:'center',
     }
 }));
   

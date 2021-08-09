@@ -1,44 +1,38 @@
-import React,{useState, useEffect} from 'react';
-import { Button, Grid,makeStyles,TextField, Typography } from '@material-ui/core';
+import React from 'react';
+import { Button, Grid, Typography } from '@material-ui/core';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import {useForm, Form} from '../Components/useForm';
 
-const initalMetricValue = {
+// all custom form Control components
+import Controls from '../Components/controls/Controls';
+
+// Services related to metrics
+import * as metricService  from '../Services/metricServices';
+
+// Object containing initial metric values
+const initalMetricValues = {
     id:0,
-    name:'',
-    value:''
+    metricName:metricService.getDefaultMetrics()[0],
+    metricValue:0,
+    timestamp: new Date(),
 }
 
-const useStyles = makeStyles(theme =>({
-    textFields:{
-        margin:theme.spacing(1),
-        width:'90%'
-    },
-
-    popupTitle:{
-        padding: theme.spacing(1)
-    },
-
-    form:{
-        padding: theme.spacing(2),
-    }
-
-}));
-
 export default function AddMetrics() {
-
-    const classes = useStyles();
-
-    const [values, setValues] = useState(initalMetricValue);
-
+    
+    //Get the relavent functions from useForm custom hook component
+    const {
+        values, 
+        setValues,
+        handleInputChange 
+    } = useForm(initalMetricValues);
 
     return (
-       <form className={classes.form}>
+       <Form>
            <Grid container>
                <Grid item>
                    <Typography
                     variant="h6"
-                    className={classes.popupTitle}
                    >
                        Insert New Metric
                     </Typography>
@@ -51,35 +45,36 @@ export default function AddMetrics() {
                    </Button>
                </Grid>
            </Grid>
+
            <Grid container>
                <Grid item xs={12}>
-                   <TextField
-                    variant="outlined"
+                    <Controls.Autocomplete
+                    value = {values.metricName}
+                    name="metricName"
                     label="Metric Name"
-                    value={values.name}
-                    className={classes.textFields}
-                   />
+                    onChange={handleInputChange}
+                    options={metricService.getDefaultMetrics()}
+                    />
                </Grid>
                <Grid item xs={12}>
-                    <TextField
-                    variant="outlined"
+                    <Controls.Input 
                     label="Metric Value"
-                    value={values.value}
-                    className={classes.textFields}
+                    name="metricValue"
+                    value={values.metricValue}
+                    onChange={handleInputChange}
                    />
                </Grid>
                <Grid item>
-                   <Button size="large">
+                    <Controls.Button>
                         <CheckCircleIcon style={{marginRight:'4px'}} />
                        Save
-                   </Button>
+                   </Controls.Button>
                    <Button size="large">
                         <CancelIcon style={{marginRight:'4px'}} />
                         Cancel
                    </Button>
                </Grid>
            </Grid>
-
-       </form>
+        </Form>
     )
 }
