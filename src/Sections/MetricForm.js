@@ -1,22 +1,20 @@
-import React from 'react';
-import { Button, Grid, Typography } from '@material-ui/core';
+import React, {useEffect} from 'react';
+import {Grid } from '@material-ui/core';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import {useForm, Form} from '../Components/useForm';
-import { useEffect } from 'react';
 
-// all custom form Control components
+//Custom reusable components
 import Controls from '../Components/controls/Controls';
 
-// Services related to metrics
+//Reusable Service Components
+import {useForm, Form} from '../Components/serviceComponents/useForm';
+
+//Services
 import * as metricService  from '../Services/metricServices';
 
-//timestamp from datetime object
-const toTimestamp = (dateTime) => {
-    return Date.parse(dateTime)/1000;
-}
 
-// Object containing initial metric values
+
+//Configurations
 const initalMetricValues = {
     id:0,
     metricName:metricService.getDefaultMetrics()[0],
@@ -24,15 +22,33 @@ const initalMetricValues = {
     timestamp:new Date(),
 }
 
+
+//timestamp from datetime object
+/*
+const toTimestamp = (dateTime) => {
+    return Date.parse(dateTime)/1000;
+}
+*/
+
+
+//Export Functions
 export default function MetricForm(props) {
 
-    const {addOrEdit, recordForEdit} = props; 
+    //Style Objects
+    //
+    //State Objects
+    //
 
-    //Validations
+
+    const {addOrEdit, recordForEdit} = props; // Retrieve required parameters from passed parameters props (ref: JS destructive syntax)
+
+    
+    //Validation Method
     const validate = (fieldValues = values) => {
         let temp = {...errors} // Existing errors are not cleared upon each validation.
-        if ('metricName' in fieldValues) // If only the property name exists in field values, validation for the particular property name is called.
-            temp.metricName = fieldValues.metricName!==null? "":"This field is required. Please use Add <Metric Name> to create new metric name"; //Field values are used instead of values is because it takes some time (asynchronous) to update values, so delay may occur
+
+        if ('metricName' in fieldValues)
+            temp.metricName = fieldValues.metricName!==null? "":"This field is required. Please use Add <Metric Name> to create new metric name";
         if ('metricValue' in fieldValues)
             temp.metricValue = (/[+-]?([0-9]*[.])?[0-9]+/).test(fieldValues.metricValue)? "":"Metric value is not valid";
         if ('timestamp' in fieldValues)
@@ -42,12 +58,16 @@ export default function MetricForm(props) {
             ...temp
         })
 
-        //Return an object with true or false values based on the condition for every element in an array. Ref: javascript mdn for every function
-        if (fieldValues === values) // Only return when handleSubmit is called
-            return Object.values(temp).every(x => x === "");
+        
+        if (fieldValues === values) // true for handleSubmit()
+            return Object.values(temp).every(x => x === ""); //true if all elements in array meets condition. Ref: javascript mdn for every function
     }
     
-    //Get the relavent functions from useForm custom hook component
+
+
+    /**
+     *  Retrieved Methods
+     */
     const {
         values, 
         setValues,
@@ -56,14 +76,28 @@ export default function MetricForm(props) {
         setErrors,
     } = useForm(initalMetricValues, true, validate);
 
-    //Form resets
+
+    
+     //Handle Edit Record request
+     useEffect(()=>{
+        if(recordForEdit !== null)
+            setValues({
+                ...recordForEdit
+            })
+        }, [setValues, recordForEdit])
+        //Use Effect Method: call setValues method when state for recordForEdit value changed (or if setValues method changes)
+
+
+
+    //Reset Form
     const resetForm = ()=>{
         initalMetricValues.timestamp = new Date();
         setValues(initalMetricValues);
         setErrors({});
     }
 
-    //Handle form submit
+
+    //Handle Form Submit
     const handleSubmit = e => {
         e.preventDefault(); // Prevent page reload by default
         
@@ -72,14 +106,8 @@ export default function MetricForm(props) {
             //metricService.insertMetric(values);
     }
 
-    // Edit function to call when record for edit value changed
-    useEffect(()=>{
-        if(recordForEdit !== null)
-            setValues({
-                ...recordForEdit
-            })
 
-    }, [recordForEdit])
+
 
 
     return (

@@ -1,3 +1,7 @@
+/**
+ *  App Navigation bar section ()
+ */
+
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -10,7 +14,7 @@ import { Grid } from '@material-ui/core';
 import GitHubIcon from '@material-ui/icons/GitHub';
 
 
-
+//Styles
 const useStyles = makeStyles(theme =>({
     menuButton:{
         flexDirection:'right'
@@ -42,9 +46,10 @@ const useStyles = makeStyles(theme =>({
     appBar:{
         backgroundColor:'#fff'
     }
-
 }));
 
+
+//Export Functions
 export default function NavBar() {
 
     const classes = useStyles();
@@ -65,7 +70,7 @@ export default function NavBar() {
                     <Grid item>
                         <Button 
                         className={classes.githubButton}
-                        onClick={()=> window.open("https://github.com/chandimaj1/factorial_test", "_blank")}
+                        onClick={()=> window.open("https://github.com/chandimaj1/factorial-test", "_blank")}
                         >
                             <GitHubIcon className={classes.githubIcon} />
                             Project Repo

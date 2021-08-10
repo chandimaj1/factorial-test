@@ -1,16 +1,30 @@
-import { makeStyles, TableBody, TableCell, TableRow, Paper, Grid } from '@material-ui/core';
+/**
+ * All related to data table for Metrics records
+ */
+
 import React, { useState } from 'react';
-import { useTable } from '../Components/useTable';
-import * as metricService from '../Services/metricServices';
-import Controls from '../Components/controls/Controls';
+import { makeStyles, TableBody, TableCell, TableRow, Paper, Grid } from '@material-ui/core';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import Popup from '../Components/Popup';
-import MetricForm from '../Sections/MetricForm';
-import { EditOutlined } from '@material-ui/icons';
 import CloseIcon from '@material-ui/icons/Close';
+import { EditOutlined } from '@material-ui/icons';
+
+//Custom Reusable Components
+import Controls from '../Components/controls/Controls';
+import Popup from '../Components/Popup';
 import Notification from '../Components/Notification';
 
-// Table styles
+//Section Components
+import MetricForm from '../Sections/MetricForm';
+
+//Reusable Service Components
+import { useTable } from '../Components/serviceComponents/useTable';
+
+//Services
+import * as metricService from '../Services/metricServices';
+
+
+
+//Styles
 const useStyles = makeStyles( theme=> ({
     container:{
         padding:theme.spacing(1),
@@ -23,7 +37,9 @@ const useStyles = makeStyles( theme=> ({
     }
 }))
 
-// Table Head
+
+
+//Configurations
 const headCells = [
     {id:'metricName', label:'Metric Name'},
     {id:'metricValue', label:'Metric Value'},
@@ -32,34 +48,46 @@ const headCells = [
 ]
 
 
+//Export Functions
 export default function MetricsTable() {
 
+    //Styles Object
     const classes = useStyles();
 
-    //Records state object - all metric records
+    //State Objects
     const [records, setRecords] = useState( metricService.getAllMetrics() );
-    //Popup state object
     const [openPopup, setOpenPopup] = useState(false);
-    //Record for edit state object
     const [recordForEdit, setRecordForEdit] = useState(null);
-    //Notifications 
     const [notify, setNotify] = useState({isOpen:false, message:'', type:''})
 
+
+
+    /**
+     *  Retrieved Methods
+     */
     const {
         TblContainer,
         TblHead,
         TblPagination,
-        recordsAfterPaging
-    }=useTable(records, headCells);
+        recordsAfterPaging,
+
+    } = useTable(records, headCells);
 
 
-    //Add or Edit employee functions
+
+    /**
+     *  Component Methods
+     */
+    
+    
+    // Add or Edit employee functions
     const addOrEdit = (metric, resetForm) =>{
+
         if (metric.id === 0){
-            metric.timestamp = new Date(); // timestamp
-            metricService.insertMetric(metric); // Add new record
+            metric.timestamp = new Date(); // new timestamp
+            metricService.insertMetric(metric); // save
         }else{
-            metricService.updateMetrics(metric); // Update the metric record
+            metricService.updateMetrics(metric); // update
         }
 
         resetForm(); // reset form
@@ -67,7 +95,7 @@ export default function MetricsTable() {
         setOpenPopup(false); // Close popup
         setRecords(metricService.getAllMetrics()); // Get updated results
 
-        //Notify
+        //Show Notification
         setNotify({
             isOpen:true,
             message:'Metric saved successfully',
@@ -75,11 +103,16 @@ export default function MetricsTable() {
         })
     }
 
+
+
+
     //Edit item (in popup)
     const openInPopup = item => {
         setRecordForEdit(item);
         setOpenPopup(true);
     }
+
+
 
     //Delete item
     const onDelete = id => {
@@ -87,7 +120,6 @@ export default function MetricsTable() {
             metricService.deleteMetric(id);
             setRecords(metricService.getAllMetrics());
 
-            //Notify
             setNotify({
                 isOpen:true,
                 message:'Metric deleted successfully',
@@ -95,6 +127,9 @@ export default function MetricsTable() {
             })
         }
     }
+
+
+
 
     return (
         <>
