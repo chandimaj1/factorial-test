@@ -6,9 +6,10 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import AssessmentIcon from '@material-ui/icons/Assessment';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { Grid } from '@material-ui/core';
 import GitHubIcon from '@material-ui/icons/GitHub';
+
+
 
 const useStyles = makeStyles(theme =>({
     menuButton:{
@@ -59,18 +60,15 @@ export default function NavBar() {
                         <Typography variant="h6" className={classes.title}>
                             Metrics App - Factorial Test
                         </Typography>
-                        <Button className={classes.githubButton}>
-                            <GitHubIcon className={classes.githubIcon} />
-                            Project Repo
-                        </Button>
                     </Grid>
                     <Grid item sm></Grid>
                     <Grid item>
-                        <Button edge="end" className={classes.addButton} color="inherit" size="medium">
-                            <AddCircleIcon />
-                            <Typography variant="h6" className={classes.addButtonText}>
-                               New Metric
-                            </Typography>
+                        <Button 
+                        className={classes.githubButton}
+                        onClick={()=> window.open("https://github.com/chandimaj1/factorial_test", "_blank")}
+                        >
+                            <GitHubIcon className={classes.githubIcon} />
+                            Project Repo
                         </Button>
                     </Grid>
                 </Grid>

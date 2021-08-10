@@ -4,8 +4,7 @@ import Averages from '../Sections/Averages';
 import NavBar from '../Components/NavBar';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import { CssBaseline } from '@material-ui/core';
-import DataGrid from '../Sections/DataGrid';
-import AddMetrics from '../Sections/AddMetrics';
+import MetricsTable from '../Sections/MetricsTable';
 
 
 const theme = createTheme({
@@ -34,8 +33,7 @@ function App() {
     <ThemeProvider theme={theme}>
         <NavBar />
         <Averages />
-        <AddMetrics />
-        <DataGrid />
+        <MetricsTable />
         <CssBaseline />
     </ThemeProvider>
   );
