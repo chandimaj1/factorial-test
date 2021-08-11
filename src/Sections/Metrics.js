@@ -60,7 +60,7 @@ const headCells = [
 //Timing Filters
 // interval in seconds
 const intervalsObject = [
-    {id:0, title:'No Average', interval:0},
+    {id:0, title:'Show All', interval:0},
     {id:1, title:'per Day', interval:86400},
     {id:2, title:'per Hour', interval:3600}, 
     {id:3, title:'per Minute', interval:60}, 
@@ -75,6 +75,8 @@ const plotValues = {
     valueFormatString:"DD/hh:mm",
     yValueFormatString: "#,###",
     xValueFormatString: "mm",
+
+    dataPoints:[]
 }
 
 
@@ -91,7 +93,7 @@ export default function MetricsTable() {
     const [notify, setNotify] = useState({isOpen:false, message:'', type:''});
     const [metricToShow, setMetricToShow] = useState({id:999, title:'Show All'});
     const [selectedInterval, setSelectedInterval] = useState(intervalsObject[0]);
-    const [plotRecords, setPlotRecords] = useState({});
+    const [plotRecords, setPlotRecords] = useState(plotValues);
 
 
     /**
@@ -177,17 +179,38 @@ export default function MetricsTable() {
 
     //Handle Plot
     const handlePlot  = (metricToShow, selectedInterval) => {
-        let recievedDataPoints = metricService.getDataPointsByNameAndTimeframe( metricToShow, selectedInterval );
+        let metricSetsData = metricService.getDataPointsByNameAndTimeframe( metricToShow, selectedInterval );
+        let metricSets = metricSetsData.metricSets;
+
+        console.log(metricSetsData);
         
+        const dataDefinitions =  {
+            yValueFormatString: plotValues.yValueFormatString,
+            xValueFormatString: plotValues.xValueFormatString,
+            type: "spline",
+        }
+
+        let data = [];
+
+        if (metricSetsData.noSets===0){
+            let dataPoints = metricSets;
+            data.push({dataPoints, ...dataDefinitions})
+        }else{
+            metricSets.forEach((dataPoints)=>{
+                data.push({dataPoints, ...dataDefinitions})
+            })
+        }
+
+        console.log(data);
+
         setPlotRecords({
-            recievedDataPoints,
-            ...plotValues
-            }
-        )
+            ...plotRecords,
+            dataPoints:data
+        })
     } 
 
+    
     useEffect(()=>{
-
             handlePlot(metricToShow, intervalsObject[0])
         }, [records, metricToShow])
         //Use Effect Method: call setValues method when state for recordForEdit value changed (or if setValues method changes)

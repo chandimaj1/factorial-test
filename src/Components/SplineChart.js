@@ -6,8 +6,6 @@ export default function SplineChart(props){
 
 	const {plotRecords} = props;
 
-	console.log(plotRecords);
-
 		const options = {
 			zoomEnabled:true,
 			animationEnabled: true,
@@ -23,15 +21,10 @@ export default function SplineChart(props){
 				includeZero: true,
 				zoomType: "x"
 			},
-			data: [
-				{
-					yValueFormatString: plotRecords.yValueFormatString,
-					xValueFormatString: plotRecords.xValueFormatString,
-					type: "spline",
-					dataPoints: plotRecords.recievedDataPoints
-				}
-			]
+			data: plotRecords.dataPoints,
 		}
+
+		console.log(options);
 		
 	return (
 		<div>
