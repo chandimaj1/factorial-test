@@ -5,7 +5,7 @@ import { Autocomplete as MuiAutocomplete } from '@material-ui/lab';
 
 export default function Autocomplete(props) {
     
-    const {name, label, value, options, onChange, error=null} = props;
+    const {name, label, value, options, onChange, error=null, isSolo} = props;
     
     /*
     * Preformatting the passed values for the onChange event (default event parameters) in the expected format (ie, name:value)
@@ -23,7 +23,7 @@ export default function Autocomplete(props) {
         value={value}
         options={options}
         getOptionLabel={(option) => option.title}
-        defaultValue={{title:"Select Metric", value:9999}}
+        defaultValue={{title:"Select Metric", value:999}}
         renderInput={
             (params) => <MuiTextField 
                             {...params}  
@@ -36,7 +36,7 @@ export default function Autocomplete(props) {
                             }
                             />
             }
-        freeSolo
+        freeSolo={isSolo}
         onChange={(e,T)=>onChange( formatDefEventPara(name, T) )}
         />
     )

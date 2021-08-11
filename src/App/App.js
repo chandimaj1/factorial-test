@@ -5,7 +5,7 @@ import { CssBaseline } from '@material-ui/core';
 
 //Sections Components
 import NavBar from '../Sections/NavBar';
-import MetricsTable from '../Sections/MetricsTable';
+import Metrics from '../Sections/Metrics';
 
 //Theme modifications
 import themeOverrides from '../Settings/themeOverrides';
@@ -18,7 +18,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
         <NavBar />
-        <MetricsTable />
+        <Metrics />
         <CssBaseline />
     </ThemeProvider>
   );

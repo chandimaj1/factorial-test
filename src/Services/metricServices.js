@@ -4,25 +4,26 @@
  * -- Modify component for connecting backend services to the application
  */
 
+//Default metric names
+import defaultMetricNames from "../Settings/defaultMetricNames";
+
+//Sample Metrics
+import sampleMetrics from "../Settings/sampleMetrics";
+
+//Services
+import * as timeService from './timeService';
+
+
 /**
 *   Constant variables
 *   (to avoid mistakes using variables)
 */
 const KEYS = {
     metrics:'metric',
-    metricId:'metricId'
+    metricId:'metricId',
+    metricNames:'metricNames',
+    metricNameId:'metricNameId',
 }
-
-
-
-//Get metrics names
-export const getDefaultMetrics = ()=>([
-    {title:"Metric A", value:0},
-    {title:"Metric B", value:1},
-    {title:"Metric C", value:2},
-    {title:"Metric D", value:3},
-])
-
 
 
 /**
@@ -37,12 +38,49 @@ export function getAllMetrics(){
     
     //Create new metrics local storage object if not exist
     if ( localStorage.getItem(KEYS.metrics ) == null){
-        localStorage.setItem(KEYS.metrics, JSON.stringify([]));
-        localStorage.setItem(KEYS.metricId,'0');
+        let generatedMetrics = sampleMetrics();
+        localStorage.setItem(KEYS.metrics, JSON.stringify(generatedMetrics));
+        localStorage.setItem(KEYS.metricId, generatedMetrics.length.toString() );
     }
 
     return JSON.parse(localStorage.getItem(KEYS.metrics))
 }
+
+
+//Fetch Metrics By Name
+export function getMetricsByName(metricToShow){
+
+    if (metricToShow !== null && metricToShow.id !== null && parseInt(metricToShow.id) !== 999){
+        return getAllMetrics().filter(x => x.metricName.id===metricToShow.id);
+    }else{
+        return getAllMetrics();
+    }
+}
+
+//Fetch Metrics by Name & Timeframe
+export function getDataPointsByNameAndTimeframe(metricToShow, selectedInterval){
+
+    console.log('metricToShow:');
+    console.log(metricToShow);
+    console.log('timeframe:');
+    console.log(selectedInterval);
+
+
+    let metrics = getMetricsByName(metricToShow);
+    let dataPoints = metrics.map(item=>({x:timeService.toDateTime(item.timestamp), y:parseInt(item.metricValue) }));
+
+    if (selectedInterval === 0){
+        return dataPoints
+    }else{
+        return dataPoints
+    }
+    
+    /*
+    let timeframeLeftValue = timeService.toTimeStamp(new Date) - (parseInt(timeframe.interval) * 6000);
+        return getMetricsByName(metricToShow).filter( x => (parseInt(x.timestamp) > timeframeLeftValue));
+        */
+}
+
 
 //Generate new id to insert records
 export function generateMetricId(){
@@ -54,7 +92,8 @@ export function generateMetricId(){
 //Insert
 export function insertMetric(data){
     let metrics = getAllMetrics();
-    data['id'] = generateMetricId();
+    data['id'] = generateMetricId(); //New Id
+    data['timestamp'] = timeService.toTimeStamp( data['timestamp'] ); //Convert datetime to timestamp
     metrics.push(data);
     localStorage.setItem(KEYS.metrics, JSON.stringify(metrics))
 }
@@ -65,8 +104,8 @@ export function updateMetrics(data){
     let metrics = getAllMetrics();
 
     //Find index for the record relavant to the record to update
-    let recordIndex = metrics.findIndex(x => x.id === data.id); 
-    
+    let recordIndex = metrics.findIndex(x => x.id === data.id);
+
     //update record
     metrics[recordIndex] = { ...data}
 
@@ -82,5 +121,30 @@ export function deleteMetric(id){
     metrics = metrics.filter(x => x.id !== id); 
 
     localStorage.setItem(KEYS.metrics, JSON.stringify(metrics));
+}
+
+
+/**
+ * 
+ * Metric Names Backend CRUD Operations
+ * (using Local Storage)
+ */
+
+
+//Get all metric names
+export function getAllMetricNames(){
+
+    //Create metric names if local storage object does not exist
+    if ( localStorage.getItem(KEYS.metricNames ) == null){
+        localStorage.setItem(KEYS.metricNames, JSON.stringify(defaultMetricNames));
+        localStorage.setItem(KEYS.metricNameId, (defaultMetricNames.length).toString());
+    }
+
+    return (JSON.parse(localStorage.getItem(KEYS.metricNames)));
+}
+
+//Fetch Metric Names having values
+export function getAllMetricNamesFrmRecords(){
+    return [...new Map( getAllMetrics().map(item => [item.metricName['id'], item.metricName]) ).values()];
 }
 

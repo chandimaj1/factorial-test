@@ -11,24 +11,19 @@ import {useForm, Form} from '../Components/serviceComponents/useForm';
 
 //Services
 import * as metricService  from '../Services/metricServices';
-
+import * as timeService from '../Services/timeService';
 
 
 //Configurations
-const initalMetricValues = {
+const initialMetricValues = {
     id:0,
-    metricName:metricService.getDefaultMetrics()[0],
+    metricName: metricService.getAllMetricNames()[0],
     metricValue:0,
-    timestamp:new Date(),
+    timestamp: new Date(),
 }
 
 
-//timestamp from datetime object
-/*
-const toTimestamp = (dateTime) => {
-    return Date.parse(dateTime)/1000;
-}
-*/
+
 
 
 //Export Functions
@@ -74,10 +69,10 @@ export default function MetricForm(props) {
         handleInputChange,
         errors,
         setErrors,
-    } = useForm(initalMetricValues, true, validate);
+    } = useForm(initialMetricValues, true, validate);
 
 
-    
+
      //Handle Edit Record request
      useEffect(()=>{
         if(recordForEdit !== null)
@@ -91,8 +86,7 @@ export default function MetricForm(props) {
 
     //Reset Form
     const resetForm = ()=>{
-        initalMetricValues.timestamp = new Date();
-        setValues(initalMetricValues);
+        setValues(initialMetricValues);
         setErrors({});
     }
 
@@ -100,7 +94,7 @@ export default function MetricForm(props) {
     //Handle Form Submit
     const handleSubmit = e => {
         e.preventDefault(); // Prevent page reload by default
-        
+
         if(validate())
             addOrEdit(values, resetForm);
             //metricService.insertMetric(values);
@@ -119,8 +113,9 @@ export default function MetricForm(props) {
                     name="metricName"
                     label="Metric Name"
                     onChange={handleInputChange}
-                    options={metricService.getDefaultMetrics()}
+                    options={metricService.getAllMetricNames()}
                     error={errors.metricName}
+                    isSolo={true}
                     />
                </Grid>
                <Grid item xs={12}>
@@ -137,7 +132,7 @@ export default function MetricForm(props) {
                     label="Timestamp"
                     name="timestamp"
                     disabled
-                    value={values.timestamp}
+                    value={timeService.toDateTime(values.timestamp)}
                     onChange={handleInputChange}
                     error={errors.timestamp}
                    />

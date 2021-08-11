@@ -5,11 +5,13 @@
 import Input from "./Input";
 import Autocomplete from "./Autocomplete";
 import Button from "./Button";
+import Select from "./Select";
 
 const Controls = {
     Input,
     Autocomplete,
     Button,
+    Select
 }
 
 export default Controls;
