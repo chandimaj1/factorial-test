@@ -2,7 +2,7 @@
  *  Metrics Section
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, TableBody, TableCell, TableRow, Paper, Grid, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { EditOutlined } from '@material-ui/icons';
@@ -66,6 +66,17 @@ const intervalsObject = [
     {id:2, title:'per Hour', interval:3600}, 
     {id:3, title:'per Minute', interval:60}, 
 ]
+
+
+//Default Plot Values
+const plotValues = {
+    chartTitle: "",
+    yAxisTitle: "",
+
+    valueFormatString:"DD/hh:mm",
+    yValueFormatString: "#,###",
+    xValueFormatString: "mm",
+}
 
 
 //Export Functions
@@ -166,17 +177,8 @@ export default function MetricsTable() {
     }
 
     //Handle Plot
-    const handlePlot  = (metricToShow, setInterval) => {
-        let recievedDataPoints = metricService.getDataPointsByNameAndTimeframe( metricToShow, setInterval );
-
-        const plotValues = {
-            chartTitle: "",
-            yAxisTitle: "",
-
-            valueFormatString:"DD/hh:mm",
-            yValueFormatString: "#,###",
-            xValueFormatString: "mm",
-        }
+    const handlePlot  = (metricToShow, selectedInterval) => {
+        let recievedDataPoints = metricService.getDataPointsByNameAndTimeframe( metricToShow, selectedInterval );
         
         setPlotRecords({
             recievedDataPoints,
@@ -184,6 +186,14 @@ export default function MetricsTable() {
             }
         )
     } 
+
+    useEffect(()=>{
+
+            handlePlot(metricToShow, intervalsObject[0])
+        }, [records])
+        //Use Effect Method: call setValues method when state for recordForEdit value changed (or if setValues method changes)
+
+
 
 
     return (
