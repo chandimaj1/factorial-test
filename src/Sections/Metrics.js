@@ -7,6 +7,7 @@ import { makeStyles, TableBody, TableCell, TableRow, Paper, Grid, Typography } f
 import CloseIcon from '@material-ui/icons/Close';
 import { EditOutlined } from '@material-ui/icons';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import Moment from 'react-moment';
 
 //Custom Reusable Components
 import Controls from '../Components/controls/Controls';
@@ -180,9 +181,6 @@ export default function MetricsTable() {
     //Handle Plot
     const handlePlot  = (metricToShow, selectedInterval) => {
         let metricSetsData = metricService.getDataPointsByNameAndTimeframe( metricToShow, selectedInterval );
-        let metricSets = metricSetsData.metricSets;
-
-        console.log(metricSetsData);
         
         const dataDefinitions =  {
             yValueFormatString: plotValues.yValueFormatString,
@@ -193,30 +191,25 @@ export default function MetricsTable() {
         let data = [];
 
         if (metricSetsData.noSets===0){
-            let dataPoints = metricSets;
+            let dataPoints = metricSetsData.metricSets;
             data.push({dataPoints, ...dataDefinitions})
         }else{
-            metricSets.forEach((dataPoints)=>{
+            metricSetsData.metricSets.forEach((dataPoints)=>{
                 data.push({dataPoints, ...dataDefinitions})
             })
         }
-
-        console.log(data);
 
         setPlotRecords({
             ...plotRecords,
             dataPoints:data
         })
-    } 
+    }
 
     
     useEffect(()=>{
-            handlePlot(metricToShow, intervalsObject[0])
+        handlePlot(metricToShow, intervalsObject[0])
         }, [records, metricToShow])
         //Use Effect Method: call setValues method when state for recordForEdit value changed (or if setValues method changes)
-
-
-
 
     return (
         <>
@@ -292,7 +285,7 @@ export default function MetricsTable() {
                             <TableRow key={item.id}>
                                 <TableCell>{item.metricName.title}</TableCell>
                                 <TableCell>{item.metricValue}</TableCell>
-                                <TableCell>{item.timestamp}</TableCell>
+                                <TableCell><Moment format="YYYY/MM/DD HH:mm:ss">{item.timestamp}</Moment></TableCell>
                                 <TableCell>
                                     <Controls.Button 
                                         color="primary"

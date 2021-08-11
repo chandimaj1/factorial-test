@@ -23,8 +23,6 @@ export default function SplineChart(props){
 			},
 			data: plotRecords.dataPoints,
 		}
-
-		console.log(options);
 		
 	return (
 		<div>

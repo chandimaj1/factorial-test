@@ -47,6 +47,7 @@ export function getAllMetrics(){
 }
 
 
+
 //Fetch Metrics By Name
 export function getMetricsByName(metricToShow){
 
@@ -56,6 +57,8 @@ export function getMetricsByName(metricToShow){
         return getAllMetrics();
     }
 }
+
+
 
 
 //Fetch Datapoints by Name & Interval
@@ -188,6 +191,7 @@ export function getAllMetricNames(){
 
 //Fetch Metric Names having values
 export function getAllMetricNamesFrmRecords(){
-    return [...new Map( getAllMetrics().map(item => [item.metricName['id'], item.metricName]) ).values()];
+    let unsorted = [...new Map( getAllMetrics().map(item => [item.metricName['id'], item.metricName]) ).values()];
+    return unsorted.sort((a,b) => (a.id > b.id)?1:-1);
 }
 

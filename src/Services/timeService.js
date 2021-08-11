@@ -6,5 +6,5 @@ export function toTimeStamp(dateTime){
 
 //Date Time from Timestamp
 export function toDateTime(timestamp){
-    return new Date(timestamp);
+    return new Date(parseInt(timestamp));
 }
