@@ -1,15 +1,7 @@
 import React from 'react';
-import { FormControl, InputLabel, makeStyles, MenuItem, Select as MuiSelect } from '@material-ui/core';
-
-const useStyles = (theme => makeStyles({
-    root:{
-        width:'400px'
-    }
-}))
+import { FormControl, InputLabel, MenuItem, Select as MuiSelect } from '@material-ui/core';
 
 export default function Select(props) {
-    
-    const classes = useStyles();
     const {name, label, value=0, options, onChange} = props;
 
     return (

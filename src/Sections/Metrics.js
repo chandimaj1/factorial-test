@@ -22,7 +22,6 @@ import SplineChart from '../Components/SplineChart';
 
 //Services
 import * as metricService from '../Services/metricServices';
-import * as timeService from '../Services/timeService';
 
 
 
@@ -190,7 +189,7 @@ export default function MetricsTable() {
     useEffect(()=>{
 
             handlePlot(metricToShow, intervalsObject[0])
-        }, [records])
+        }, [records, metricToShow])
         //Use Effect Method: call setValues method when state for recordForEdit value changed (or if setValues method changes)
 
 
