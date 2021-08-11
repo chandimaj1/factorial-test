@@ -57,7 +57,6 @@ export function getMetricsByName(metricToShow){
     }
 }
 
-//Fetch Metrics by Name & View
 
 //Fetch Datapoints by Name & Interval
 export function getDataPointsByNameAndTimeframe(metricToShow, selectedInterval){
@@ -76,7 +75,7 @@ export function getDataPointsByNameAndTimeframe(metricToShow, selectedInterval){
 
     }else{
 
-        //Creating Grouped Array
+        //Grouped Array
         let interval = selectedInterval.interval*1000;
         let groupedDataPoints = [];
         let p=metrics.map(item=>({x:parseInt(item.timestamp), y:parseInt(item.metricValue)}));
@@ -90,7 +89,7 @@ export function getDataPointsByNameAndTimeframe(metricToShow, selectedInterval){
             }
         }
 
-        //Creating datapoints array
+        //dataPoints array from grouped array
         let averagedDataPoints = [];
 
         groupedDataPoints.forEach((arr)=> {
@@ -99,15 +98,11 @@ export function getDataPointsByNameAndTimeframe(metricToShow, selectedInterval){
                 total += a.y
             });
 
-            averagedDataPoints.push({x:arr.x, y:(total/arr.y.length) })
+            averagedDataPoints.push({x:arr.x, y:timeService.toDateTime(total/arr.y.length) })
         });
 
         return averagedDataPoints;
     } 
-    /*
-    let timeframeLeftValue = timeService.toTimeStamp(new Date) - (parseInt(timeframe.interval) * 6000);
-        return getMetricsByName(metricToShow).filter( x => (parseInt(x.timestamp) > timeframeLeftValue));
-        */
 }
 
 

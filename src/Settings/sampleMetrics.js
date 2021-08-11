@@ -2,6 +2,8 @@
  * Sample Metrics Generator
  * 
  */
+import defaultMetricNames from "./defaultMetricNames";
+const defaultMetrics = defaultMetricNames;
 
 
 //timestamp from datetime object
@@ -17,22 +19,7 @@ function randomNumber(min, max, inc) {
     return Math.floor(Math.random() * (max - min) / inc) * inc + min;
 }
 
- const defaultMetrics = [
-    {id:0, title:"Metric A"},
-    {id:1, title:"Metric B"},
-    {id:2, title:"Metric C"},
-    {id:3, title:"Metric D"},
-]
-
 const sampleDataset = [];
-
-/*
-[
-    {
-        "id": 3, "metricName": {"id": 0,"title": "Metric A"}, "metricValue": "5", "timestamp": 1628657733112
-    }
-]
-*/
 
 export default function sampleMetrics(){
     
