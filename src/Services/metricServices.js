@@ -98,7 +98,7 @@ export function getDataPointsByNameAndTimeframe(metricToShow, selectedInterval){
                 total += a.y
             });
 
-            averagedDataPoints.push({x:arr.x, y:timeService.toDateTime(total/arr.y.length) })
+            averagedDataPoints.push({x:timeService.toDateTime(arr.x), y:(total/arr.y.length) })
         });
 
         return averagedDataPoints;
