@@ -9,6 +9,7 @@ export default function SplineChart(props){
 	console.log(plotRecords);
 
 		const options = {
+			zoomEnabled:true,
 			animationEnabled: true,
 			title:{
 				text: plotRecords.chartTitle
@@ -19,7 +20,8 @@ export default function SplineChart(props){
 			axisY: {
 				title: plotRecords.yAxisTitle,
 				prefix: "",
-				includeZero: true
+				includeZero: true,
+				zoomType: "x"
 			},
 			data: [
 				{

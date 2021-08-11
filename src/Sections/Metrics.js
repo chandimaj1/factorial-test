@@ -3,7 +3,7 @@
  */
 
 import React, { useState } from 'react';
-import { makeStyles, TableBody, TableCell, TableRow, Paper, Grid } from '@material-ui/core';
+import { makeStyles, TableBody, TableCell, TableRow, Paper, Grid, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { EditOutlined } from '@material-ui/icons';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -36,6 +36,13 @@ const useStyles = makeStyles( theme=> ({
     BtnAddMetric:{
         float:'right',
         marginBottom: theme.spacing(1)
+    },
+
+    smallBtn:{
+        fontSize:'1em',
+        padding:'2px 10px',
+        position:'relative',
+        float:'right'
     }
 }))
 
@@ -164,11 +171,11 @@ export default function MetricsTable() {
 
         const plotValues = {
             chartTitle: "",
-            yAxisTitle: "Metric Values",
+            yAxisTitle: "",
 
-            valueFormatString:"hh:mm",
+            valueFormatString:"DD/hh:mm",
             yValueFormatString: "#,###",
-            xValueFormatString: "mm:ss",
+            xValueFormatString: "mm",
         }
         
         setPlotRecords({
@@ -187,7 +194,7 @@ export default function MetricsTable() {
                     <Controls.Autocomplete
                     value = {metricToShow}
                     name="selectedMetricName"
-                    label="Metrics to show"
+                    label="Sort by Metric"
                     onChange={handleMetricChange}
                     options={metricService.getAllMetricNamesFrmRecords()}
                     isSolo={true}
@@ -217,10 +224,27 @@ export default function MetricsTable() {
                         Add Metric
                     </Controls.Button>
                 </Grid>
+
+                <Grid item xs={12}>
+                    <Controls.Button
+                        className={classes.smallBtn}
+                        color="secondary"
+                        onClick={()=>{
+                                localStorage.removeItem('metric');
+                                localStorage.removeItem('metricId');
+                                window.location.reload(false);
+                        }}
+                    >
+                        Generate New Sample Dataset
+                    </Controls.Button>
+                </Grid>
             </Grid>
         </Paper>
 
         <Paper className={classes.container}>
+             <Typography variant="h6" style={{margin:'15px', fontSize:'12pt', position:'relative'}}>
+                Select data range to Zoom
+            </Typography>
             <SplineChart plotRecords={plotRecords} />
         </Paper>
 
