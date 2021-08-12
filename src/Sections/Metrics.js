@@ -93,7 +93,7 @@ export default function MetricsTable() {
     const [recordForEdit, setRecordForEdit] = useState(null);
     const [notify, setNotify] = useState({isOpen:false, message:'', type:''});
     const [metricToShow, setMetricToShow] = useState({id:999, title:'Show All'});
-    const [selectedInterval, setSelectedInterval] = useState(intervalsObject[0]);
+    const [selectedInterval, setSelectedInterval] = useState(intervalsObject[1]);
     const [plotRecords, setPlotRecords] = useState(plotValues);
 
 
@@ -207,7 +207,7 @@ export default function MetricsTable() {
 
     
     useEffect(()=>{
-        handlePlot(metricToShow, intervalsObject[0])
+        handlePlot(metricToShow, intervalsObject[1])
         }, [records, metricToShow])
         //Use Effect Method: call setValues method when state for recordForEdit value changed (or if setValues method changes)
 
