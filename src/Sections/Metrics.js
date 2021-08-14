@@ -203,6 +203,8 @@ export default function MetricsTable() {
             ...plotRecords,
             dataPoints:data
         })
+
+        setSelectedInterval(selectedInterval);
     }
 
     

@@ -29,4 +29,4 @@ export default function SplineChart(props){
 			<CanvasJSChart options = {options} />
 		</div>
 	);
-}                         
+}
