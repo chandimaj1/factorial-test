@@ -2,12 +2,15 @@
  *  Metrics Section
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles, TableBody, TableCell, TableRow, Paper, Grid, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { EditOutlined } from '@material-ui/icons';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import Moment from 'react-moment';
+
+//Custom Service Components
+import {useMetricApiService, useFormApiService} from '../Components/serviceComponents/useApiService';
 
 //Custom Reusable Components
 import Controls from '../Components/controls/Controls';
@@ -19,10 +22,7 @@ import MetricForm from './MetricForm';
 
 //Reusable Service Components
 import { useTable } from '../Components/serviceComponents/useTable';
-import SplineChart from '../Components/SplineChart';
-
-//Services
-import * as metricService from '../Services/metricServices';
+import {useChart} from '../Components/serviceComponents/useChart';
 
 
 
@@ -36,13 +36,6 @@ const useStyles = makeStyles( theme=> ({
     BtnAddMetric:{
         float:'right',
         marginBottom: theme.spacing(1)
-    },
-
-    smallBtn:{
-        fontSize:'1em',
-        padding:'2px 10px',
-        position:'relative',
-        float:'right'
     }
 }))
 
@@ -60,7 +53,7 @@ const headCells = [
 
 //Timing Filters
 // interval in seconds
-const intervalsObject = [
+const filterIntervals = [
     {id:0, title:'Show All', interval:0},
     {id:1, title:'per Day', interval:86400},
     {id:2, title:'per Hour', interval:3600}, 
@@ -68,8 +61,8 @@ const intervalsObject = [
 ]
 
 
-//Default Plot Values
-const plotValues = {
+//Default Chart plot values
+const plotRecords = {
     chartTitle: "",
     yAxisTitle: "",
 
@@ -88,25 +81,46 @@ export default function MetricsTable() {
     const classes = useStyles();
 
     //State Objects
-    const [records, setRecords] = useState( metricService.getAllMetrics() );
+    //const [records, setRecords] = useState( metricService.getAllMetrics() );
     const [openPopup, setOpenPopup] = useState(false);
     const [recordForEdit, setRecordForEdit] = useState(null);
     const [notify, setNotify] = useState({isOpen:false, message:'', type:''});
     const [metricToShow, setMetricToShow] = useState({id:999, title:'Show All'});
-    const [selectedInterval, setSelectedInterval] = useState(intervalsObject[1]);
-    const [plotRecords, setPlotRecords] = useState(plotValues);
-
 
     /**
-     *  Retrieved Methods
+     *  Methods from hooks
      */
+
+    const {
+        Chart,
+        setPlotRecords,
+    } = useChart(plotRecords)
+
+    const {
+        interval,
+        setInterval,
+        selectedRecords,
+        updateRecordsForMetricName,
+        updateRecordsForInterval,
+        nonEmptyMetricNamesList,
+        insertNewMetric,
+        updateMetric,
+        deleteMetric,
+    } = useMetricApiService(setNotify, plotRecords, setPlotRecords, setMetricToShow)
+
     const {
         TblContainer,
         TblHead,
         TblPagination,
         recordsAfterPaging,
+    } = useTable(selectedRecords, headCells);
 
-    } = useTable(records, headCells);
+    const {
+        metricNamesList,
+        updateMetricNamesList
+    } = useFormApiService()
+
+
 
 
 
@@ -115,27 +129,23 @@ export default function MetricsTable() {
      */
     
     
-    // Add or Edit employee functions
-    const addOrEdit = (metric, resetForm) =>{
+    //Form Methods
 
+    //Add or Edit employee
+    const addOrEdit = (metric, resetForm) =>{
         if (metric.id === 0){
             metric.timestamp = new Date(); // new timestamp
-            metricService.insertMetric(metric); // save
+            insertNewMetric(metric); // save
         }else{
-            metricService.updateMetrics(metric); // update
+            updateMetric(metric); // update
         }
 
         resetForm(); // reset form
         setRecordForEdit(null); // reset record for edit
         setOpenPopup(false); // Close popup
-        setRecords(metricService.getAllMetrics()); // Get updated results
 
-        //Show Notification
-        setNotify({
-            isOpen:true,
-            message:'Metric saved successfully',
-            type:'success'
-        })
+        //Update UI
+        updateRecordsForMetricName(false);
     }
 
 
@@ -152,63 +162,36 @@ export default function MetricsTable() {
     //Delete item
     const onDelete = id => {
         if( window.confirm('Are you sure to delete this record?') ){
-            metricService.deleteMetric(id);
-            setRecords(metricService.getAllMetrics());
-
-            setNotify({
-                isOpen:true,
-                message:'Metric deleted successfully',
-                type:'error'
-            })
+            deleteMetric(id);
         }
     }
 
 
-    //handle metric select
+    //handle metric name select
     const handleMetricChange = e=>{
-            setMetricToShow(e.target.value);
-            setRecords(metricService.getMetricsByName( e.target.value, selectedInterval ));
-            handlePlot(e.target.value,selectedInterval);
+        const metric_name = e.target.value;
+        const id = (!metric_name)?false: metric_name.id;
+        updateRecordsForMetricName(id)
     }
 
-    //handle timeframe select
-    const handleTimeframeChange = e=>{
-        let interval = intervalsObject.find(item => item.id === e.target.value)
-        setSelectedInterval( interval );
-        handlePlot(metricToShow,interval);
+    //handle Interval select
+    const handleIntervalChange = e=>{
+        let interval = filterIntervals.find(item => item.id === e.target.value)
+        setInterval(interval);
+        updateRecordsForInterval(interval);
     }
 
-    //Handle Plot
-    const handlePlot  = (metricToShow, selectedInterval) => {
-        let metricSetsData = metricService.getDataPointsByNameAndTimeframe( metricToShow, selectedInterval );
-        
-        const dataDefinitions =  {
-            yValueFormatString: plotValues.yValueFormatString,
-            xValueFormatString: plotValues.xValueFormatString,
-            type: "spline",
-        }
 
-        let data = [];
+    /**
+     *  Use Effect methods ( handle state change objects )
+     */
 
-        if (metricSetsData.noSets===0){
-            let dataPoints = metricSetsData.metricSets;
-            data.push({dataPoints, ...dataDefinitions})
-        }else{
-            metricSetsData.metricSets.forEach((dataPoints)=>{
-                data.push({dataPoints, ...dataDefinitions})
-            })
-        }
-
-        setPlotRecords({
-            ...plotRecords,
-            dataPoints:data
-        })
-    }
-
-    
+    /*
     useEffect(()=>{
-        handlePlot(metricToShow, intervalsObject[1])
-        }, [records, metricToShow])
+        handlePlot(metricToShow, filterIntervals[1])
+    }, [records, metricToShow])
+     */
+
         //Use Effect Method: call setValues method when state for recordForEdit value changed (or if setValues method changes)
 
     return (
@@ -221,18 +204,19 @@ export default function MetricsTable() {
                     name="selectedMetricName"
                     label="Sort by Metric"
                     onChange={handleMetricChange}
-                    options={metricService.getAllMetricNamesFrmRecords()}
+                    options={nonEmptyMetricNamesList}
                     isSolo={true}
                     errors={{}}
+                    defaultValue={false}
                     />
                 </Grid>
                 <Grid item xs={5} md={3}>
                     <Controls.Select
                     name="timeframe"
                     label="Plot Averages"
-                    value={selectedInterval.id}
-                    onChange={handleTimeframeChange}
-                    options={intervalsObject}
+                    value={interval.id}
+                    onChange={handleIntervalChange}
+                    options={filterIntervals}
                     errors={{}}
                     />
                 </Grid>
@@ -249,20 +233,6 @@ export default function MetricsTable() {
                         Add Metric
                     </Controls.Button>
                 </Grid>
-
-                <Grid item xs={12}>
-                    <Controls.Button
-                        className={classes.smallBtn}
-                        color="secondary"
-                        onClick={()=>{
-                                localStorage.removeItem('metric');
-                                localStorage.removeItem('metricId');
-                                window.location.reload(false);
-                        }}
-                    >
-                        Generate New Sample Dataset
-                    </Controls.Button>
-                </Grid>
             </Grid>
         </Paper>
 
@@ -270,7 +240,7 @@ export default function MetricsTable() {
              <Typography variant="h6" style={{margin:'15px', fontSize:'12pt', position:'relative'}}>
                 Select data range to Zoom
             </Typography>
-            <SplineChart plotRecords={plotRecords} />
+            <Chart plotRecords={plotRecords} />
         </Paper>
 
         <Paper className={classes.container}>
@@ -318,6 +288,8 @@ export default function MetricsTable() {
             <MetricForm 
                 addOrEdit = {addOrEdit}
                 recordForEdit = {recordForEdit}
+                metricNamesList = {metricNamesList}
+                updateMetricNamesList = {updateMetricNamesList}
             />
         </Popup>
         <Notification

@@ -1,23 +1,19 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Grid } from '@material-ui/core';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 //Custom reusable components
 import Controls from '../Components/controls/Controls';
+import Notification from '../Components/Notification';
 
 //Reusable Service Components
 import {useForm, Form} from '../Components/serviceComponents/useForm';
 
-//Services
-import * as metricService  from '../Services/metricServices';
-import * as timeService from '../Services/timeService';
-
-
 //Configurations
 const initialMetricValues = {
     id:0,
-    metricName: metricService.getAllMetricNames()[0],
+    metricName: [],
     metricValue:0,
     timestamp: new Date(),
 }
@@ -29,13 +25,11 @@ const initialMetricValues = {
 //Export Functions
 export default function MetricForm(props) {
 
-    //Style Objects
-    //
-    //State Objects
-    //
+    const {addOrEdit, recordForEdit, metricNamesList} = props;
+    initialMetricValues.metricName = metricNamesList[0]; //Set first metric name as default
 
-
-    const {addOrEdit, recordForEdit} = props; // Retrieve required parameters from passed parameters props (ref: JS destructive syntax)
+    //State objects
+    const [notify, setNotify] = useState({isOpen:false, message:'', type:''});
 
     
     //Validation Method
@@ -72,7 +66,6 @@ export default function MetricForm(props) {
     } = useForm(initialMetricValues, true, validate);
 
 
-
      //Handle Edit Record request
      useEffect(()=>{
         if(recordForEdit !== null)
@@ -97,63 +90,67 @@ export default function MetricForm(props) {
 
         if(validate())
             addOrEdit(values, resetForm);
-            //metricService.insertMetric(values);
     }
 
 
 
 
-
     return (
-       <Form onSubmit={ handleSubmit }>
-           <Grid container>
-               <Grid item xs={12}>
-                    <Controls.Autocomplete
-                    value = {values.metricName}
-                    name="metricName"
-                    label="Metric Name"
-                    onChange={handleInputChange}
-                    options={metricService.getAllMetricNames()}
-                    error={errors.metricName}
-                    isSolo={true}
-                    />
-               </Grid>
-               <Grid item xs={12}>
-                    <Controls.Input 
-                    label="Metric Value"
-                    name="metricValue"
-                    value={values.metricValue}
-                    onChange={handleInputChange}
-                    error={errors.metricValue}
-                   />
-               </Grid>
-               <Grid item xs={12}>
-                    <Controls.Input 
-                    label="Timestamp"
-                    name="timestamp"
-                    disabled
-                    value={timeService.toDateTime(values.timestamp)}
-                    onChange={handleInputChange}
-                    error={errors.timestamp}
-                   />
-               </Grid>
-               <Grid item>
-                    <Controls.Button
-                    type="submit"
-                    >
-                        <CheckCircleIcon style={{marginRight:'4px'}} />
-                       Save
-                   </Controls.Button>
-                   <Controls.Button
-                    type="reset"
-                    color="default"
-                    onClick={resetForm}
-                    >
-                        <CancelIcon style={{marginRight:'4px'}} />
-                       Reset
-                   </Controls.Button>
-               </Grid>
-           </Grid>
-        </Form>
+        <>
+            <Form onSubmit={ handleSubmit }>
+                <Grid container>
+                    <Grid item xs={12}>
+                            <Controls.Autocomplete
+                            value = {values.metricName}
+                            name="metricName"
+                            label="Metric Name"
+                            onChange={handleInputChange}
+                            options={metricNamesList}
+                            error={errors.metricName}
+                            isSolo={true}
+                            />
+                    </Grid>
+                    <Grid item xs={12}>
+                            <Controls.Input 
+                            label="Metric Value"
+                            name="metricValue"
+                            value={values.metricValue}
+                            onChange={handleInputChange}
+                            error={errors.metricValue}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                            <Controls.Input 
+                            label="Timestamp (Auto generated upon record entry)"
+                            name="timestamp"
+                            disabled
+                            value={values.timestamp}
+                            onChange={handleInputChange}
+                            error={errors.timestamp}
+                        />
+                    </Grid>
+                    <Grid item>
+                            <Controls.Button
+                            type="submit"
+                            >
+                                <CheckCircleIcon style={{marginRight:'4px'}} />
+                            Save
+                        </Controls.Button>
+                        <Controls.Button
+                            type="reset"
+                            color="default"
+                            onClick={resetForm}
+                            >
+                                <CancelIcon style={{marginRight:'4px'}} />
+                            Reset
+                        </Controls.Button>
+                    </Grid>
+                </Grid>
+                </Form>
+                <Notification
+                notify={notify}
+                setNotify={setNotify}
+                />
+        </>
     )
 }

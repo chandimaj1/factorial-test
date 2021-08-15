@@ -18,7 +18,7 @@ const useStyles = makeStyles( theme=>({
     }    
 }))
 
-export function useTable(records, headCells) {
+export function useTable(selectedRecords, headCells) {
 
     const classes = useStyles();
 
@@ -37,7 +37,7 @@ export function useTable(records, headCells) {
     }
 
     const recordsAfterPaging = () =>{
-        return records.slice(page*rowsPerPage, (page+1)*rowsPerPage);
+        return selectedRecords.slice(page*rowsPerPage, (page+1)*rowsPerPage);
     }
     
     //Wrapper for MuiTable
@@ -67,7 +67,7 @@ export function useTable(records, headCells) {
             page={page}
             rowsPerPageOptions={pages}
             rowsPerPage={rowsPerPage}
-            count={records.length}
+            count={selectedRecords.length}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
         />

@@ -3,6 +3,10 @@
  * Services related to Metrics records
  * -- Modify component for connecting backend services to the application
  */
+import React from 'react';
+import axios from "axios";
+import apiEndPoints from '../Settings/apiSettings';
+import useApiService from '../Components/serviceComponents/useApiService';
 
 //Default metric names
 import defaultMetricNames from "../Settings/defaultMetricNames";
@@ -42,7 +46,8 @@ export function getAllMetrics(){
         localStorage.setItem(KEYS.metrics, JSON.stringify(generatedMetrics));
         localStorage.setItem(KEYS.metricId, generatedMetrics.length.toString() );
     }
-
+    
+    //console.log(JSON.parse(localStorage.getItem(KEYS.metrics)));
     return JSON.parse(localStorage.getItem(KEYS.metrics))
 }
 
