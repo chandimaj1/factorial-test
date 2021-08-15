@@ -225,6 +225,7 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
         metricValue: item.value,
         timestamp: item.created_at
       };
+
       return newItem;
     });
   }
@@ -237,14 +238,11 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
     
   //Get Averaged Datapoints
   const getAveragedDataPoints = (records, interval) => {
-    console.log(interval)
     if (interval.interval === 0 || !interval){
-      const x =  records.map(item=>({
+      return records.map(item=>({
                 x:timeService.toTimeStamp(item.timestamp), 
                 y:parseInt(item.metricValue) 
               }));
-      console.log(x);
-      return x;
 
     }else{
       //Grouping by interval
@@ -254,6 +252,7 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
           x:timeService.toTimeStamp(item.timestamp), 
           y:parseInt(item.metricValue)
         }));
+
       for (let i=p[0].x;  i < p[p.length-1].x;  i+=t){
           let arr = p.filter((d) => ((i+t) > d.x && d.x >= i));
           if (arr.length>0){
@@ -261,11 +260,14 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
               groupedDataPoints.push({x:timestampMedian, y:arr});   
           }
       }
+
       //Averaging
       let averagedDataPoints = [];
       groupedDataPoints.forEach((arr)=> {
           let total = 0;
+          
           arr.y.forEach( (a)=>{ total += a.y });
+
           averagedDataPoints.push({
             x:timeService.toDateTime(arr.x),
               y:(total/arr.y.length) 
