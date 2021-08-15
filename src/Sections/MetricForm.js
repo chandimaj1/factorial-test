@@ -20,8 +20,6 @@ const initialMetricValues = {
 
 
 
-
-
 //Export Functions
 export default function MetricForm(props) {
 
@@ -65,6 +63,11 @@ export default function MetricForm(props) {
         setErrors,
     } = useForm(initialMetricValues, true, validate);
 
+    
+
+    /**
+     * Components methods
+     */
 
      //Handle Edit Record request
      useEffect(()=>{

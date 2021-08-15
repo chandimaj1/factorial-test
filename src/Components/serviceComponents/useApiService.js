@@ -5,15 +5,16 @@
 import { useState } from 'react';
 import axios from "axios";
 
-/**
- *  Configurations
- */
-import apiEndPoints from '../../Settings/apiSettings';
-
+//Service methods
 import * as timeService from '../../Services/timeService';
 
+//Configurations
+import apiEndPoints from '../../Settings/apiSettings';
 
 
+/*
+  Export Methods
+*/
 export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
 
   /**
@@ -24,13 +25,15 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
   const [interval, setInterval] = useState({id:1, title:'per Day', interval:86400});
 
 
-
+  //Configurations
+  
   //Chart Set Definitions
   const dataDefinitions =  {
     yValueFormatString: plotRecords.yValueFormatString,
     xValueFormatString: plotRecords.xValueFormatString,
     type: "spline",
   }
+
 
 
   /**
@@ -40,8 +43,8 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
 
 
   //Get All Metrics including parent
+
   const getAllMetrics = () => {
-    //setSelectedMetricRecord(false)
     axios.get(apiEndPoints.metrics_list).then((response) => {
       const formatted_response = formatResponseForRecords(response);
       setSelectedRecords(formatted_response)
@@ -61,7 +64,9 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
   }
 
 
-  //All Non empty metric names (without included children metrics)
+
+  //Non-empty metric names list
+
   const getNonEmptyMetricNamesList = () => {
     axios.get(apiEndPoints.non_empty_metric_names).then((response) => {
       const formatted_response = response.data;
@@ -82,24 +87,20 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
   }
 
 
+
   //Insert new metric
+
   const insertNewMetric = (metric) => {
     const params = {
       metric_name_id: metric.metricName.id,
       value: metric.metricValue
     }
+    //Api Call
     axios.post(apiEndPoints.insert_new_metric, params).then((response) => {
-      setNotify({
-        isOpen:true, 
-        type:'success', 
-        message:'New metric inserted'
-      })
+      setNotify({isOpen:true, type:'success', message:'New metric inserted'})
     }).catch((error) => {
       console.log(error);
-      setNotify({
-        isOpen:true, 
-        type:'error', 
-        message:'Error. could not insert new metric'
+      setNotify({isOpen:true, type:'error', message:'Error. could not insert new metric'
       })
     })
   }
@@ -107,6 +108,7 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
 
 
   //Update metric
+
   const updateMetric = (metric) => {
     const params = {
       value: metric.metricValue
@@ -128,7 +130,9 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
   }
 
 
+  
   //Delete metric
+
   const deleteMetric = (id) => {
     axios.delete(apiEndPoints.delete_metric + id).then((response) => {
       setNotify({
@@ -148,57 +152,61 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
 
 
 
-  //On metric name changed
-    const updateRecordsForMetricName = (metric_name_id) =>{
+  // Update on metric name change
 
-      //set end point
-      let apiEndPoint = apiEndPoints.metrics_for_metric_name; //Specific metric name
-      if (!metric_name_id){ //If false passed (for all or reset)
-        apiEndPoint = apiEndPoints.metrics_list
-      }
+  const updateRecordsForMetricName = (metric_name_id) =>{
 
-      //Get metrics for metric name
-        const params = {
-          id:metric_name_id
-        }
-        axios.get(apiEndPoint, { params: params }).then((response) => {
-          const formatted_response = formatResponseForRecords(response);
-          setNotify({
-            isOpen:true, 
-            type:'success', 
-            message:'Metrics data fetched for name id:' + metric_name_id
-          })
-          setSelectedRecords(formatted_response)
-          const metricSetsData = {
-            noSets:0, 
-            metricSets:getAveragedDataPoints(formatted_response, interval)
-          }
-          plotChart(metricSetsData)
-          
-        }).catch((error) => {
-          console.log(error);
-          setNotify({
-            isOpen:true, 
-            type:'error', 
-            message:'Error. Couldn not fetch data from server for id:'+metric_name_id
-          })
-          return false;
-        })
+    //set end point
+    let apiEndPoint = apiEndPoints.metrics_for_metric_name; //Specific metric name
+    if (!metric_name_id){ //If false passed (for all or reset)
+      apiEndPoint = apiEndPoints.metrics_list
     }
 
-
-    //On interval changed
-    const updateRecordsForInterval = (interval) => {
+    const params = {
+      id:metric_name_id
+    }
+    //Api call
+    axios.get(apiEndPoint, { params: params }).then((response) => {
+      const formatted_response = formatResponseForRecords(response);
+      setNotify({
+        isOpen:true, 
+        type:'success', 
+        message:'Metrics data fetched for name id:' + metric_name_id
+      })
+      setSelectedRecords(formatted_response)
+      
+      //plot chart
       const metricSetsData = {
-        noSets:0,
-        metricSets:getAveragedDataPoints(selectedRecords, interval)
+        noSets:0, 
+        metricSets:getAveragedDataPoints(formatted_response, interval)
       }
-      plotChart(metricSetsData, interval)
+      plotChart(metricSetsData)
+      
+    }).catch((error) => {
+      console.log(error);
+      setNotify({
+        isOpen:true, 
+        type:'error', 
+        message:'Error. Couldn not fetch data from server for id:'+metric_name_id
+      })
+    })
+  }
+
+
+
+  // Update on interval change
+
+  const updateRecordsForInterval = (interval) => {
+    const metricSetsData = {
+      noSets:0,
+      metricSets:getAveragedDataPoints(selectedRecords, interval)
     }
+    plotChart(metricSetsData, interval)
+  }
 
 
+  
 
-    
 
   /**
    *  Private Functions
@@ -223,7 +231,9 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
 
 
 
-  //Helper functions for chart datapoints calculations
+  /**
+   * Chart related methods
+   */
     
   //Get Averaged Datapoints
   const getAveragedDataPoints = (records, interval) => {
@@ -285,7 +295,11 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
   }
 
 
-  //Run once on init
+
+
+  /*
+  * Run once on init
+  */
   useState(()=>{
     getAllMetrics();
     getNonEmptyMetricNamesList();
@@ -293,21 +307,17 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
   },[])
 
 
+
   return {
     interval,
     setInterval,
-
     selectedRecords,
     setSelectedRecords,
-
     getAllMetrics,
-
     updateRecordsForMetricName,
     updateRecordsForInterval,
-
     nonEmptyMetricNamesList,
     getNonEmptyMetricNamesList,
-
     insertNewMetric,
     updateMetric,
     deleteMetric,
@@ -317,22 +327,28 @@ export function useMetricApiService(setNotify, plotRecords, setPlotRecords) {
 
 
 
+//Export function
+
 export function useFormApiService(){
   const [metricNamesList, setMetricNamesList] = useState([]);
 
-  //All Metric Names (without included children metrics)
+  //Unfiltered Metric Names List
+
   const updateMetricNamesList = () => {
+    //api call
     axios.get(apiEndPoints.metric_names_list).then((response) => {
       const formatted_response = response.data;
-      console.log(formatted_response);
       setMetricNamesList(formatted_response)
-
     }).catch((error) => {
       console.log(error);
     })
   }
 
-  //Run once on init
+
+
+  /*
+  * Run once on init
+  */
   useState(()=>{
     updateMetricNamesList();
   },[])

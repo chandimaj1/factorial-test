@@ -9,6 +9,9 @@ import { EditOutlined } from '@material-ui/icons';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import Moment from 'react-moment';
 
+//Configurations
+import metric_configs from '../Settings/metric_configs';
+
 //Custom Service Components
 import {useMetricApiService, useFormApiService} from '../Components/serviceComponents/useApiService';
 
@@ -42,36 +45,10 @@ const useStyles = makeStyles( theme=> ({
 
 
 //Configurations
+const headCells = metric_configs.headCells;
+const filterIntervals = metric_configs.filterIntervals;
+const plotRecords = metric_configs.plotRecords;
 
-//Table head cells
-const headCells = [
-    {id:'metricName', label:'Metric Name'},
-    {id:'metricValue', label:'Metric Value'},
-    {id:'timestamp', label:'Timestamp'},
-    {id:'actions', label:'Actions'},
-]
-
-//Timing Filters
-// interval in seconds
-const filterIntervals = [
-    {id:0, title:'Show All', interval:0},
-    {id:1, title:'per Day', interval:86400},
-    {id:2, title:'per Hour', interval:3600}, 
-    {id:3, title:'per Minute', interval:60}, 
-]
-
-
-//Default Chart plot values
-const plotRecords = {
-    chartTitle: "",
-    yAxisTitle: "",
-
-    valueFormatString:"DD/hh:mm",
-    yValueFormatString: "#,###",
-    xValueFormatString: "mm",
-
-    dataPoints:[]
-}
 
 
 //Export Functions
@@ -182,17 +159,6 @@ export default function MetricsTable() {
     }
 
 
-    /**
-     *  Use Effect methods ( handle state change objects )
-     */
-
-    /*
-    useEffect(()=>{
-        handlePlot(metricToShow, filterIntervals[1])
-    }, [records, metricToShow])
-     */
-
-        //Use Effect Method: call setValues method when state for recordForEdit value changed (or if setValues method changes)
 
     return (
         <>
