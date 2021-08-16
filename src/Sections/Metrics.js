@@ -49,6 +49,7 @@ const headCells = metric_configs.headCells;
 const filterIntervals = metric_configs.filterIntervals;
 const plotRecords = metric_configs.plotRecords;
 
+const metricToShowAll = {id:9999, title:'Show All'}
 
 
 //Export Functions
@@ -58,14 +59,13 @@ export default function MetricsTable() {
     const classes = useStyles();
 
     //State Objects
-    //const [records, setRecords] = useState( metricService.getAllMetrics() );
     const [openPopup, setOpenPopup] = useState(false);
     const [recordForEdit, setRecordForEdit] = useState(null);
     const [notify, setNotify] = useState({isOpen:false, message:'', type:''});
-    const [metricToShow, setMetricToShow] = useState({id:999, title:'Show All'});
+    const [metricToShow, setMetricToShow] = useState(metricToShowAll);
 
     /**
-     *  Methods from hooks
+     *  Retireved Methods from hooks
      */
 
     const {
@@ -121,8 +121,10 @@ export default function MetricsTable() {
         setRecordForEdit(null); // reset record for edit
         setOpenPopup(false); // Close popup
 
+
         //Update UI
         updateRecordsForMetricName(false);
+        setMetricToShow(metricToShowAll); // Reset select name field
     }
 
 

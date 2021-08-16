@@ -15,6 +15,8 @@ const apiEndPoints = {
      * Metric Names related endpoints
      */
 
+    
+    /** Metric Names */
     //GET all metric names and including metrics
     metric_names:api_host + '/api/v1/metric_names',
 
@@ -24,6 +26,8 @@ const apiEndPoints = {
     //GET non empty metric names
     non_empty_metric_names:api_host + '/api/v1/non_empty_metric_names',
 
+
+    /** Metrics */
     //GET all metrics for specific parent metric name (requires: id parameter)
     metrics_for_metric_name: api_host+'/api/v2/metrics_for_metric_name',
 
